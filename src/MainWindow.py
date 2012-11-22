@@ -43,8 +43,10 @@ class MainWindow:
         window.show_all()
 
     def number_press(self, widget, data=None):
-        if widget.get_label == '.' and not('.' in self.entry.get_text()):
+        if widget.get_label() == "." and not('.' in self.entry.get_text()):
             self.entry.set_text(self.entry.get_text() + ".0")
+        elif widget.get_label() == ".":
+            pass
         else:
             self.entry.set_text(self.entry.get_text() + widget.get_label())
 
