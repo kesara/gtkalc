@@ -41,8 +41,11 @@ class MainWindow:
         builder.connect_signals(handlers)
 
         self.entry = builder.get_object("entry")
+        self.status = builder.get_object("statusbar")
+        self.history = builder.get_object("history").get_buffer()
         self.value = None
         self.operator = None
+        self.refresh = False
         
         window = builder.get_object("main_window")
         window.show_all()
@@ -51,6 +54,8 @@ class MainWindow:
         """
         Performs changes on text entry depending on user input.
         """
+        if self.refresh:
+            self.entry.set_text("")
         if widget.get_label() == "±" and not("-" in self.entry.get_text()):
             self.entry.set_text("-" + self.entry.get_text())
         elif widget.get_label() == "±":
@@ -66,22 +71,38 @@ class MainWindow:
         """
         Handles user inputs on mathematical operations.
         """
-        if self.value:
+        if widget.get_label() == "=":
             self.operation()
-            self.value = float(self.entry.get_text())
+            self.operator = True
         else:
-            self.value = float(self.entry.get_text())
-            self.entry.set_text("")
-        # Set operator
-        self.operator = widget.get_label()
+            if self.value:
+                self.operation()
+                self.value = float(self.entry.get_text())
+            else:
+                self.value = float(self.entry.get_text())
+                self.entry.set_text("")
+            # Set operator
+            self.status.push(0, widget.get_label())
+            self.operator = widget.get_label()
 
     def operation(self):
         """
         Perform mathematical operations
         """
-        if self.operator == '+':
+        self.history.insert_at_cursor("{0} {1} {2} = ".format(self.value,
+            self.operator, self.entry.get_text()))
+        if self.operator == "+":
             self.entry.set_text(str(self.value + float(self.entry.get_text())))
-        elif self.operator == '-':
+        elif self.operator == "-":
             self.entry.set_text(str(self.value - float(self.entry.get_text())))
+        elif self.operator == "÷":
+            self.entry.set_text(str(self.value / float(self.entry.get_text())))
+        elif self.operator == "×":
+            self.entry.set_text(str(self.value * float(self.entry.get_text())))
+        self.history.insert_at_cursor("{0}\n".format(self.entry.get_text()))
+        #elif self.operator == "":
+        #    self.entry.set_text(str(self.value  float(self.entry.get_text())))
         self.value = None
         self.operator = None
+        self.refresh = True
+        self.status.pop(0)
