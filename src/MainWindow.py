@@ -31,28 +31,57 @@ class MainWindow:
     """
     def __init__(self):
         handlers = {
-                "onWindowDelete"    : Gtk.main_quit,
-                "onMenuQuit"        : Gtk.main_quit,
-                "onNumberButtonClick"     : self.number_press
+                "onWindowDelete"            : Gtk.main_quit,
+                "onMenuQuit"                : Gtk.main_quit,
+                "onNumberButtonClick"       : self.number_press,
+                "onOperationButtonClick"    : self.operation_press
         }
         builder = Gtk.Builder()
         builder.add_from_file("MainWindow.glade")
         builder.connect_signals(handlers)
 
         self.entry = builder.get_object("entry")
+        self.value = None
+        self.operator = None
         
         window = builder.get_object("main_window")
         window.show_all()
 
     def number_press(self, widget, data=None):
+        """
+        Performs changes on text entry depending on user input.
+        """
         if widget.get_label() == "±" and not("-" in self.entry.get_text()):
             self.entry.set_text("-" + self.entry.get_text())
         elif widget.get_label() == "±":
             self.entry.set_text(self.entry.get_text()[1:])
         elif widget.get_label() == "." and not("." in self.entry.get_text()):
-            self.entry.set_text(self.entry.get_text() + ".0")
+            self.entry.set_text(self.entry.get_text() + ".")
         elif widget.get_label() == ".":
             pass
         else:
             self.entry.set_text(self.entry.get_text() + widget.get_label())
 
+    def operation_press(self, widget, data=None):
+        """
+        Handles user inputs on mathematical operations.
+        """
+        if self.value:
+            self.operation()
+            self.value = float(self.entry.get_text())
+        else:
+            self.value = float(self.entry.get_text())
+            self.entry.set_text("")
+        # Set operator
+        self.operator = widget.get_label()
+
+    def operation(self):
+        """
+        Perform mathematical operations
+        """
+        if self.operator == '+':
+            self.entry.set_text(str(self.value + float(self.entry.get_text())))
+        elif self.operator == '-':
+            self.entry.set_text(str(self.value - float(self.entry.get_text())))
+        self.value = None
+        self.operator = None
