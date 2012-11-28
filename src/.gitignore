@@ -1,3 +1,6 @@
 # Compiled source #
 ###################
 *.pyc
+# Temporary files #
+# #################
+*.swp
