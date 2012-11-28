@@ -45,7 +45,8 @@ class MainWindow:
         self.history = builder.get_object("history").get_buffer()
         self.value = None
         self.operator = None
-        self.refresh = False
+        self.entry.set_text("0")
+        self.refresh = True
         
         window = builder.get_object("main_window")
         window.show_all()
@@ -61,11 +62,15 @@ class MainWindow:
         elif widget.get_label() == "±":
             self.entry.set_text(self.entry.get_text()[1:])
         elif widget.get_label() == "." and not("." in self.entry.get_text()):
-            self.entry.set_text(self.entry.get_text() + ".")
+            if self.refresh:
+                self.entry.set_text("0.")
+            else:
+                self.entry.set_text(self.entry.get_text() + ".")
         elif widget.get_label() == ".":
             pass
         else:
             self.entry.set_text(self.entry.get_text() + widget.get_label())
+        self.refresh = False
 
     def operation_press(self, widget, data=None):
         """
@@ -80,10 +85,11 @@ class MainWindow:
                 self.value = float(self.entry.get_text())
             else:
                 self.value = float(self.entry.get_text())
-                self.entry.set_text("")
+                self.entry.set_text("0")
             # Set operator
             self.status.push(0, widget.get_label())
             self.operator = widget.get_label()
+            self.refresh = True
 
     def operation(self):
         """
@@ -104,5 +110,4 @@ class MainWindow:
         #    self.entry.set_text(str(self.value  float(self.entry.get_text())))
         self.value = None
         self.operator = None
-        self.refresh = True
         self.status.pop(0)
