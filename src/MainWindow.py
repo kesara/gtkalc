@@ -95,19 +95,33 @@ class MainWindow:
         """
         Perform mathematical operations
         """
-        self.history.insert_at_cursor("{0} {1} {2} = ".format(self.value,
+        self.history.insert_at_cursor("{0} {1} {2} =".format(
+            self.formatValue(self.value),
             self.operator, self.entry.get_text()))
         if self.operator == "+":
-            self.entry.set_text(str(self.value + float(self.entry.get_text())))
+            self.entry.set_text(self.formatValue(str(self.value +
+                float(self.entry.get_text()))))
         elif self.operator == "-":
-            self.entry.set_text(str(self.value - float(self.entry.get_text())))
+            self.entry.set_text(self.formatValue(str(self.value -
+                float(self.entry.get_text()))))
         elif self.operator == "÷":
-            self.entry.set_text(str(self.value / float(self.entry.get_text())))
+            self.entry.set_text(self.formatValue(str(self.value /
+                float(self.entry.get_text()))))
         elif self.operator == "×":
-            self.entry.set_text(str(self.value * float(self.entry.get_text())))
+            self.entry.set_text(self.formatValue(str(self.value *
+                float(self.entry.get_text()))))
         self.history.insert_at_cursor("{0}\n".format(self.entry.get_text()))
-        #elif self.operator == "":
-        #    self.entry.set_text(str(self.value  float(self.entry.get_text())))
         self.value = None
         self.operator = None
         self.status.pop(0)
+
+    def formatValue(self, value):
+        """
+        Remove .0 when applicable.
+        """
+        value = str(value)
+        if value[-2:] == ".0":
+            return value[:-2]
+        else:
+            return value
+
