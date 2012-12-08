@@ -95,7 +95,7 @@ class MainWindow:
         """
         Perform mathematical operations
         """
-        self.history.insert_at_cursor("{0} {1} {2} =".format(
+        self.history.insert_at_cursor("{0} {1} {2} = ".format(
             self.formatValue(self.value),
             self.operator, self.entry.get_text()))
         if self.operator == "+":
