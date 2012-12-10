@@ -89,7 +89,7 @@ class MainWindow:
             # Set operator
             self.status.push(0, widget.get_label())
             self.operator = widget.get_label()
-            self.refresh = True
+        self.refresh = True
 
     def operation(self):
         """
