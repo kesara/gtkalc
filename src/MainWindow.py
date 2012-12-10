@@ -24,6 +24,7 @@
 ################################################################################
 
 from gi.repository import Gtk
+import math
 
 class MainWindow:
     """
@@ -40,6 +41,7 @@ class MainWindow:
         builder.add_from_file("MainWindow.glade")
         builder.connect_signals(handlers)
 
+        self.window = builder.get_object("main_window")
         self.entry = builder.get_object("entry")
         self.status = builder.get_object("statusbar")
         self.history = builder.get_object("history").get_buffer()
@@ -55,7 +57,7 @@ class MainWindow:
         """
         Performs changes on text entry depending on user input.
         """
-        if self.refresh:
+        if self.refresh and widget.get_label() != "±":
             self.entry.set_text("")
         if widget.get_label() == "±" and not("-" in self.entry.get_text()):
             self.entry.set_text("-" + self.entry.get_text())
@@ -66,8 +68,6 @@ class MainWindow:
                 self.entry.set_text("0.")
             else:
                 self.entry.set_text(self.entry.get_text() + ".")
-        elif widget.get_label() == ".":
-            pass
         else:
             self.entry.set_text(self.entry.get_text() + widget.get_label())
         self.refresh = False
@@ -78,7 +78,11 @@ class MainWindow:
         """
         if widget.get_label() == "=":
             self.operation()
-            self.operator = True
+        elif widget.get_label() in ("!n"):
+            if self.value:
+                self.operation()
+            self.operator = widget.get_label()
+            self.singleValueOperation()
         else:
             if self.value:
                 self.operation()
@@ -90,6 +94,27 @@ class MainWindow:
             self.status.push(0, widget.get_label())
             self.operator = widget.get_label()
         self.refresh = True
+
+    def singleValueOperation(self):
+        """
+        Perform operations where only one is involved.
+        """
+        if self.operator == "!n":
+            try:
+                self.value = math.factorial(int(self.entry.get_text()))
+            except ValueError:
+                Gtk.MessageDialog(self.window, 0, Gtk.MessageType.ERROR,
+                        Gtk.ButtonsType.CANCEL,
+                        "The value must be non-negative integer")
+                self.operator = None
+                self.history.insert_at_cursor(
+                    "!{0} ERROR: The value must be non-negative integer\n".format(
+                        self.entry.get_text()))
+                return
+            self.history.insert_at_cursor("!{0} = {1}\n".format(
+                self.entry.get_text(), str(self.value)))
+        self.value = None
+        self.operator = None
 
     def operation(self):
         """
