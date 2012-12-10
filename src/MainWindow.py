@@ -78,7 +78,7 @@ class MainWindow:
         """
         if widget.get_label() == "=":
             self.operation()
-        elif widget.get_label() in ("!n"):
+        elif widget.get_label() in ("!n", "√"):
             if self.value:
                 self.operation()
             self.operator = widget.get_label()
@@ -104,15 +104,30 @@ class MainWindow:
                 self.value = math.factorial(int(self.entry.get_text()))
             except ValueError:
                 Gtk.MessageDialog(self.window, 0, Gtk.MessageType.ERROR,
-                        Gtk.ButtonsType.CANCEL,
-                        "The value must be non-negative integer")
+                    Gtk.ButtonsType.CANCEL,
+                    "The value must be non-negative integer.")
                 self.operator = None
                 self.history.insert_at_cursor(
-                    "!{0} ERROR: The value must be non-negative integer\n".format(
+                    "!{0} ERROR: The value must be non-negative integer.\n".format(
                         self.entry.get_text()))
                 return
             self.history.insert_at_cursor("!{0} = {1}\n".format(
                 self.entry.get_text(), str(self.value)))
+        elif self.operator == "√":
+            try:
+                self.value = math.sqrt(float(self.entry.get_text()))
+            except ValueError:
+                Gtk.MessageDialog(self.window, 0, Gtk.MessageType.ERROR,
+                    Gtk.ButtonsType.CANCEL,
+                    "The value must be non-negative. Imaginary numbers not supported.")
+                self.operator = None
+                self.history.insert_at_cursor(
+                    "!{0} ERROR: The value must be non-negative.\n".format(
+                        self.entry.get_text()))
+                return
+            self.history.insert_at_cursor("√{0} = {1}\n".format(
+                self.entry.get_text(), str(self.value)))
+
         self.value = None
         self.operator = None
 
