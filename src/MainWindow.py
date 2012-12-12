@@ -78,7 +78,7 @@ class MainWindow:
         """
         if self.value:
             self.operation()
-        if widget.get_label() in ("!n", "√"):
+        if widget.get_label() in ("!n", "√", "x²", "x³"):
             self.operator = widget.get_label()
             self.singleValueOperation()
         elif widget.get_label() != "=":
@@ -88,68 +88,66 @@ class MainWindow:
             self.operator = widget.get_label()
         self.refresh = True
         
-#        if widget.get_label() == "=":
-#            self.operation()
-#        elif widget.get_label() in ("!n", "√"):
-#            if self.value:
-#                self.operation()
-#            self.operator = widget.get_label()
-#            self.singleValueOperation()
-#        else:
-#            if self.value:
-#                self.operation()
-#                self.value = float(self.entry.get_text())
-#            else:
-#                self.value = float(self.entry.get_text())
-#                self.entry.set_text("0")
-#            # Set operator
-#            self.status.push(0, widget.get_label())
-#            self.operator = widget.get_label()
-#        self.refresh = True
-
     def singleValueOperation(self):
         """
         Perform operations where only one is involved.
         """
         if self.operator == "!n":
+            self.history.insert_at_cursor("!{0} = ".format(
+                self.entry.get_text()))
             try:
-                self.value = math.factorial(int(self.entry.get_text()))
+                self.entry.set_text(math.factorial(
+                    int(self.entry.get_text())))
             except ValueError:
                 Gtk.MessageDialog(self.window, 0, Gtk.MessageType.ERROR,
                     Gtk.ButtonsType.CANCEL,
                     "The value must be non-negative integer.")
                 self.operator = None
                 self.history.insert_at_cursor(
-                    "!{0} ERROR: The value must be non-negative integer.\n".format(
-                        self.entry.get_text()))
+                    "ERROR: The value must be non-negative integer.\n")
                 return
-            self.history.insert_at_cursor("!{0} = {1}\n".format(
-                self.entry.get_text(), str(self.value)))
+            self.history.insert_at_cursor("{0}\n".format(self.entry.get_text()))
         elif self.operator == "√":
+            self.history.insert_at_cursor("√{0} = ".format(
+                self.entry.get_text()))
             try:
-                self.value = math.sqrt(float(self.entry.get_text()))
+                self.entry.set_text(self.formatValue(math.sqrt(
+                    float(self.entry.get_text()))))
             except ValueError:
                 Gtk.MessageDialog(self.window, 0, Gtk.MessageType.ERROR,
                     Gtk.ButtonsType.CANCEL,
                     "The value must be non-negative. Imaginary numbers not supported.")
                 self.operator = None
                 self.history.insert_at_cursor(
-                    "!{0} ERROR: The value must be non-negative.\n".format(
-                        self.entry.get_text()))
+                    "ERROR: The value must be non-negative.\n")
                 return
-            self.history.insert_at_cursor("√{0} = {1}\n".format(
-                self.entry.get_text(), self.formatValue(self.value)))
+            self.history.insert_at_cursor("{0}\n".format(self.entry.get_text()))
+        elif self.operator == "x²":
+            self.history.insert_at_cursor("{0}² = ".format(
+                self.entry.get_text()))
+            self.entry.set_text(self.formatValue(pow(float(self.entry.get_text()),
+                2)))
+            self.history.insert_at_cursor("{0}\n".format(self.entry.get_text()))
+        elif self.operator == "x³":
+            self.history.insert_at_cursor("{0}³ = ".format(
+                self.entry.get_text()))
+            self.entry.set_text(self.formatValue(pow(float(self.entry.get_text()),
+                3)))
+            self.history.insert_at_cursor("{0}\n".format(self.entry.get_text()))
 
-        self.value = None
         self.operator = None
 
     def operation(self):
         """
         Perform mathematical operations
         """
-        self.history.insert_at_cursor("{0} {1} {2} = ".format(
-            self.formatValue(self.value),
-            self.operator, self.entry.get_text()))
+        if self.operator == "xⁿ":
+            self.history.insert_at_cursor("{0} ^ {1} = ".format(
+                self.formatValue(self.value), self.entry.get_text()))
+        else:
+            self.history.insert_at_cursor("{0} {1} {2} = ".format(
+                self.formatValue(self.value),
+                self.operator, self.entry.get_text()))
         if self.operator == "+":
             self.entry.set_text(self.formatValue(str(self.value +
                 float(self.entry.get_text()))))
@@ -162,6 +160,12 @@ class MainWindow:
         elif self.operator == "×":
             self.entry.set_text(self.formatValue(str(self.value *
                 float(self.entry.get_text()))))
+        elif self.operator == "×":
+            self.entry.set_text(self.formatValue(str(self.value *
+                float(self.entry.get_text()))))
+        elif self.operator == "xⁿ":
+            self.entry.set_text(self.formatValue(str(pow(self.value,
+                float(self.entry.get_text())))))
         self.history.insert_at_cursor("{0}\n".format(self.entry.get_text()))
         self.value = None
         self.operator = None
