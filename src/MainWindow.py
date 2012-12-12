@@ -76,24 +76,36 @@ class MainWindow:
         """
         Handles user inputs on mathematical operations.
         """
-        if widget.get_label() == "=":
+        if self.value:
             self.operation()
-        elif widget.get_label() in ("!n", "√"):
-            if self.value:
-                self.operation()
+        if widget.get_label() in ("!n", "√"):
             self.operator = widget.get_label()
             self.singleValueOperation()
-        else:
-            if self.value:
-                self.operation()
-                self.value = float(self.entry.get_text())
-            else:
-                self.value = float(self.entry.get_text())
-                self.entry.set_text("0")
+        elif widget.get_label() != "=":
+            self.value = float(self.entry.get_text())
             # Set operator
             self.status.push(0, widget.get_label())
             self.operator = widget.get_label()
         self.refresh = True
+        
+#        if widget.get_label() == "=":
+#            self.operation()
+#        elif widget.get_label() in ("!n", "√"):
+#            if self.value:
+#                self.operation()
+#            self.operator = widget.get_label()
+#            self.singleValueOperation()
+#        else:
+#            if self.value:
+#                self.operation()
+#                self.value = float(self.entry.get_text())
+#            else:
+#                self.value = float(self.entry.get_text())
+#                self.entry.set_text("0")
+#            # Set operator
+#            self.status.push(0, widget.get_label())
+#            self.operator = widget.get_label()
+#        self.refresh = True
 
     def singleValueOperation(self):
         """
@@ -126,7 +138,7 @@ class MainWindow:
                         self.entry.get_text()))
                 return
             self.history.insert_at_cursor("√{0} = {1}\n".format(
-                self.entry.get_text(), str(self.value)))
+                self.entry.get_text(), self.formatValue(self.value)))
 
         self.value = None
         self.operator = None
