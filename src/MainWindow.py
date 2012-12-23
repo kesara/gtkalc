@@ -36,7 +36,8 @@ class MainWindow:
                 "onMenuQuit"                : Gtk.main_quit,
                 "onNumberButtonClick"       : self.number_press,
                 "onOperationButtonClick"    : self.operation_press,
-                "onMemoryButtonClick"       : self.memory_press
+                "onMemoryButtonClick"       : self.memory_press,
+                "onAllCancelButtonClick"    : self.all_cancel
         }
         builder = Gtk.Builder()
         builder.add_from_file("MainWindow.glade")
@@ -54,6 +55,16 @@ class MainWindow:
         
         window = builder.get_object("main_window")
         window.show_all()
+
+    def all_cancel(self, widget, data=None):
+        """
+        Perform all cancel operation.
+        """
+        self.value = None
+        self.operator = None
+        self.entry.set_text("0")
+        self.refresh = True
+        self.status.pop(0)
 
     def number_press(self, widget, data=None):
         """
@@ -75,6 +86,9 @@ class MainWindow:
         self.refresh = False
 
     def memory_press(self, widget, data=None):
+        """
+        Performs memory operations
+        """
         if widget.get_label() == "MC":
             self.memory = 0
             self.status.pop(1)
