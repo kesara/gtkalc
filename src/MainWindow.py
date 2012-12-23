@@ -38,6 +38,7 @@ class MainWindow:
                 "onOperationButtonClick"    : self.operation_press,
                 "onMemoryButtonClick"       : self.memory_press,
                 "onAllCancelButtonClick"    : self.all_cancel_press,
+                "onCancelButtonClick"       : self.cancel_press,
                 "onBackspaceButtonClick"    : self.backspace_press
         }
         builder = Gtk.Builder()
@@ -56,6 +57,16 @@ class MainWindow:
         
         window = builder.get_object("main_window")
         window.show_all()
+
+    def cancel_press(self, widget, data=None):
+        """
+        Perform cancel operation.
+        """
+        self.operator = None
+        self.entry.set_text(self.format_value(self.value))
+        self.value = None
+        self.refresh = True
+        self.status.pop(0)
 
     def all_cancel_press(self, widget, data=None):
         """
