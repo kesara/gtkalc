@@ -37,7 +37,8 @@ class MainWindow:
                 "onNumberButtonClick"       : self.number_press,
                 "onOperationButtonClick"    : self.operation_press,
                 "onMemoryButtonClick"       : self.memory_press,
-                "onAllCancelButtonClick"    : self.all_cancel
+                "onAllCancelButtonClick"    : self.all_cancel_press,
+                "onBackspaceButtonClick"    : self.backspace_press
         }
         builder = Gtk.Builder()
         builder.add_from_file("MainWindow.glade")
@@ -56,7 +57,7 @@ class MainWindow:
         window = builder.get_object("main_window")
         window.show_all()
 
-    def all_cancel(self, widget, data=None):
+    def all_cancel_press(self, widget, data=None):
         """
         Perform all cancel operation.
         """
@@ -65,6 +66,12 @@ class MainWindow:
         self.entry.set_text("0")
         self.refresh = True
         self.status.pop(0)
+
+    def backspace_press(self,widget, data=None):
+        """
+        Perform backspace operation.
+        """
+        self.entry.set_text(self.entry.get_text()[:-1])
 
     def number_press(self, widget, data=None):
         """
