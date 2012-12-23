@@ -35,7 +35,8 @@ class MainWindow:
                 "onWindowDelete"            : Gtk.main_quit,
                 "onMenuQuit"                : Gtk.main_quit,
                 "onNumberButtonClick"       : self.number_press,
-                "onOperationButtonClick"    : self.operation_press
+                "onOperationButtonClick"    : self.operation_press,
+                "onMemoryButtonClick"       : self.memory_press
         }
         builder = Gtk.Builder()
         builder.add_from_file("MainWindow.glade")
@@ -46,6 +47,7 @@ class MainWindow:
         self.status = builder.get_object("statusbar")
         self.history = builder.get_object("history").get_buffer()
         self.value = None
+        self.memory = 0
         self.operator = None
         self.entry.set_text("0")
         self.refresh = True
@@ -72,6 +74,24 @@ class MainWindow:
             self.entry.set_text(self.entry.get_text() + widget.get_label())
         self.refresh = False
 
+    def memory_press(self, widget, data=None):
+        if widget.get_label() == "MC":
+            self.memory = 0
+            self.status.pop(1)
+        elif widget.get_label() == "MR":
+            self.entry.set_text(self.format_value(self.memory))
+        elif widget.get_label() in ("M+", "M-"):
+            if self.value:
+                self.operation()
+            if widget.get_label() == "M+":
+                self.memory += float(self.entry.get_text())
+            if widget.get_label() == "M-":
+                self.memory -= float(self.entry.get_text())
+            self.status.pop(1)
+            self.status.push(1, "M={0}".format(
+                self.format_value(self.memory)))
+        self.refres = True
+
     def operation_press(self, widget, data=None):
         """
         Handles user inputs on mathematical operations.
@@ -80,7 +100,7 @@ class MainWindow:
             self.operation()
         if widget.get_label() in ("!n", "√", "x²", "x³"):
             self.operator = widget.get_label()
-            self.singleValueOperation()
+            self.single_value_operation()
         elif widget.get_label() != "=":
             self.value = float(self.entry.get_text())
             # Set operator
@@ -88,7 +108,7 @@ class MainWindow:
             self.operator = widget.get_label()
         self.refresh = True
         
-    def singleValueOperation(self):
+    def single_value_operation(self):
         """
         Perform operations where only one is involved.
         """
@@ -111,7 +131,7 @@ class MainWindow:
             self.history.insert_at_cursor("√{0} = ".format(
                 self.entry.get_text()))
             try:
-                self.entry.set_text(self.formatValue(math.sqrt(
+                self.entry.set_text(self.format_value(math.sqrt(
                     float(self.entry.get_text()))))
             except ValueError:
                 Gtk.MessageDialog(self.window, 0, Gtk.MessageType.ERROR,
@@ -125,13 +145,13 @@ class MainWindow:
         elif self.operator == "x²":
             self.history.insert_at_cursor("{0}² = ".format(
                 self.entry.get_text()))
-            self.entry.set_text(self.formatValue(pow(float(self.entry.get_text()),
+            self.entry.set_text(self.format_value(pow(float(self.entry.get_text()),
                 2)))
             self.history.insert_at_cursor("{0}\n".format(self.entry.get_text()))
         elif self.operator == "x³":
             self.history.insert_at_cursor("{0}³ = ".format(
                 self.entry.get_text()))
-            self.entry.set_text(self.formatValue(pow(float(self.entry.get_text()),
+            self.entry.set_text(self.format_value(pow(float(self.entry.get_text()),
                 3)))
             self.history.insert_at_cursor("{0}\n".format(self.entry.get_text()))
 
@@ -143,35 +163,35 @@ class MainWindow:
         """
         if self.operator == "xⁿ":
             self.history.insert_at_cursor("{0} ^ {1} = ".format(
-                self.formatValue(self.value), self.entry.get_text()))
+                self.format_value(self.value), self.entry.get_text()))
         else:
             self.history.insert_at_cursor("{0} {1} {2} = ".format(
-                self.formatValue(self.value),
+                self.format_value(self.value),
                 self.operator, self.entry.get_text()))
         if self.operator == "+":
-            self.entry.set_text(self.formatValue(str(self.value +
+            self.entry.set_text(self.format_value(str(self.value +
                 float(self.entry.get_text()))))
         elif self.operator == "-":
-            self.entry.set_text(self.formatValue(str(self.value -
+            self.entry.set_text(self.format_value(str(self.value -
                 float(self.entry.get_text()))))
         elif self.operator == "÷":
-            self.entry.set_text(self.formatValue(str(self.value /
+            self.entry.set_text(self.format_value(str(self.value /
                 float(self.entry.get_text()))))
         elif self.operator == "×":
-            self.entry.set_text(self.formatValue(str(self.value *
+            self.entry.set_text(self.format_value(str(self.value *
                 float(self.entry.get_text()))))
         elif self.operator == "×":
-            self.entry.set_text(self.formatValue(str(self.value *
+            self.entry.set_text(self.format_value(str(self.value *
                 float(self.entry.get_text()))))
         elif self.operator == "xⁿ":
-            self.entry.set_text(self.formatValue(str(pow(self.value,
+            self.entry.set_text(self.format_value(str(pow(self.value,
                 float(self.entry.get_text())))))
         self.history.insert_at_cursor("{0}\n".format(self.entry.get_text()))
         self.value = None
         self.operator = None
         self.status.pop(0)
 
-    def formatValue(self, value):
+    def format_value(self, value):
         """
         Remove .0 when applicable.
         """
