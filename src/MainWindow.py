@@ -40,7 +40,8 @@ class MainWindow:
                 "onAllCancelButtonClick"    : self.all_cancel_press,
                 "onCancelButtonClick"       : self.cancel_press,
                 "onBackspaceButtonClick"    : self.backspace_press,
-                "onSeparatorButtonClick"    : self.separator_press
+                "onSeparatorButtonClick"    : self.separator_press,
+                "onClearButtonClick"        : self.clear_press
         }
         builder = Gtk.Builder()
         builder.add_from_file("MainWindow.glade")
@@ -87,9 +88,15 @@ class MainWindow:
 
     def separator_press(self, widget, data=None):
         """
-        Perform separator button tasks.
+        Perform separator button tasks on history panel.
         """
         self.history.insert_at_cursor("============\n")
+
+    def clear_press(self, widget, data=None):
+        """
+        Perform clear function on history panel.
+        """
+        self.history.set_text("")
         
 
     def number_press(self, widget, data=None):
