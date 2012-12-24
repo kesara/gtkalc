@@ -60,8 +60,7 @@ class MainWindow:
         self.entry.set_text("0")
         self.refresh = True
         
-        window = builder.get_object("main_window")
-        window.show_all()
+        self.window.show_all()
 
     def clipboard_operation(self, widget, data=None):
         """
