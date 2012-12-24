@@ -41,7 +41,8 @@ class MainWindow:
                 "onCancelButtonClick"       : self.cancel_press,
                 "onBackspaceButtonClick"    : self.backspace_press,
                 "onSeparatorButtonClick"    : self.separator_press,
-                "onClearButtonClick"        : self.clear_press
+                "onClearButtonClick"        : self.clear_press,
+                "onSaveButtonClick"         : self.save_press
         }
         builder = Gtk.Builder()
         builder.add_from_file("MainWindow.glade")
@@ -98,6 +99,31 @@ class MainWindow:
         """
         self.history.set_text("")
         
+    def save_press(self, widget, data=None):
+        """
+        Perform save function on history panel.
+        """
+        dialog = Gtk.FileChooserDialog("Save File", self.window,
+                Gtk.FileChooserAction.SAVE,
+                (Gtk.STOCK_CANCEL, Gtk.ResponseType.CANCEL,
+                 Gtk.STOCK_SAVE, Gtk.ResponseType.ACCEPT))
+        response = dialog.run()
+        if response == Gtk.ResponseType.ACCEPT:
+            try:
+                f = open(dialog.get_filename(), "w")
+                f.write(self.history.get_text(self.history.get_start_iter(),
+                    self.history.get_end_iter(), False))
+                f.close()
+            except Exception,e:
+                error_dialog =  Gtk.MessageDialog(self.window, 0,
+                    Gtk.MessageType.ERROR,
+                    Gtk.ButtonsType.CANCEL, "Error")
+                error_dialog.format_secondary_text(e)
+                error_dialog.run()
+                error_dialog.destroy()
+        else:
+            pass
+        dialog.destroy()
 
     def number_press(self, widget, data=None):
         """
@@ -163,12 +189,15 @@ class MainWindow:
             self.history.insert_at_cursor("!{0} = ".format(
                 self.entry.get_text()))
             try:
-                self.entry.set_text(math.factorial(
-                    int(self.entry.get_text())))
+                self.entry.set_text(str(math.factorial(
+                    int(self.entry.get_text()))))
             except ValueError:
-                Gtk.MessageDialog(self.window, 0, Gtk.MessageType.ERROR,
-                    Gtk.ButtonsType.CANCEL,
+                dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.ERROR,
+                    Gtk.ButtonsType.CANCEL, "Error")
+                dialog.format_secondary_text(
                     "The value must be non-negative integer.")
+                dialog.run()
+                dialog.destroy()
                 self.operator = None
                 self.history.insert_at_cursor(
                     "ERROR: The value must be non-negative integer.\n")
@@ -181,9 +210,12 @@ class MainWindow:
                 self.entry.set_text(self.format_value(math.sqrt(
                     float(self.entry.get_text()))))
             except ValueError:
-                Gtk.MessageDialog(self.window, 0, Gtk.MessageType.ERROR,
-                    Gtk.ButtonsType.CANCEL,
+                dialog = Gtk.MessageDialog(self.window, 0, Gtk.MessageType.ERROR,
+                    Gtk.ButtonsType.CANCEL, "Error")
+                dialog.format_secondary_text(
                     "The value must be non-negative. Imaginary numbers not supported.")
+                dialog.run()
+                dialog.destroy()
                 self.operator = None
                 self.history.insert_at_cursor(
                     "ERROR: The value must be non-negative.\n")
