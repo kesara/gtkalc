@@ -39,7 +39,8 @@ class MainWindow:
                 "onMemoryButtonClick"       : self.memory_press,
                 "onAllCancelButtonClick"    : self.all_cancel_press,
                 "onCancelButtonClick"       : self.cancel_press,
-                "onBackspaceButtonClick"    : self.backspace_press
+                "onBackspaceButtonClick"    : self.backspace_press,
+                "onSeparatorButtonClick"    : self.separator_press
         }
         builder = Gtk.Builder()
         builder.add_from_file("MainWindow.glade")
@@ -78,11 +79,18 @@ class MainWindow:
         self.refresh = True
         self.status.pop(0)
 
-    def backspace_press(self,widget, data=None):
+    def backspace_press(self, widget, data=None):
         """
         Perform backspace operation.
         """
         self.entry.set_text(self.entry.get_text()[:-1])
+
+    def separator_press(self, widget, data=None):
+        """
+        Perform separator button tasks.
+        """
+        self.history.insert_at_cursor("============\n")
+        
 
     def number_press(self, widget, data=None):
         """
