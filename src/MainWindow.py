@@ -23,7 +23,7 @@
 #
 ################################################################################
 
-from gi.repository import Gtk
+from gi.repository import Gtk, Gdk
 import math
 
 class MainWindow:
@@ -34,6 +34,8 @@ class MainWindow:
         handlers = {
                 "onWindowDelete"            : Gtk.main_quit,
                 "onMenuQuit"                : Gtk.main_quit,
+                "onMenuSave"                : self.save_press,
+                "onMenuClipboard"           : self.clipboard_operation,
                 "onNumberButtonClick"       : self.number_press,
                 "onOperationButtonClick"    : self.operation_press,
                 "onMemoryButtonClick"       : self.memory_press,
@@ -60,6 +62,21 @@ class MainWindow:
         
         window = builder.get_object("main_window")
         window.show_all()
+
+    def clipboard_operation(self, widget, data=None):
+        """
+        Perform cut, copy & pate (Clipboard operation)
+        """
+        clipboard = Gtk.Clipboard.get(Gdk.SELECTION_CLIPBOARD)
+        if widget.get_label() == "gtk-cut":
+            clipboard.set_text(self.entry.get_text(), -1)
+            self.entry.set_text("0")
+            self.refresh = True
+        elif widget.get_label() == "gtk-copy":
+            clipboard.set_text(self.entry.get_text(), -1)
+        elif widget.get_label() == "gtk-paste":
+            self.entry.set_text(clipboard.wait_for_text())
+            self.refresh = False
 
     def cancel_press(self, widget, data=None):
         """
