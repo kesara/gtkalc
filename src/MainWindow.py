@@ -25,6 +25,7 @@
 
 from gi.repository import Gtk, Gdk
 import math
+import AboutDialog
 
 class MainWindow:
     """
@@ -36,6 +37,7 @@ class MainWindow:
                 "onMenuQuit"                : Gtk.main_quit,
                 "onMenuSave"                : self.save_press,
                 "onMenuClipboard"           : self.clipboard_operation,
+                "onMenuAbout"               : self.about,
                 "onNumberButtonClick"       : self.number_press,
                 "onOperationButtonClick"    : self.operation_press,
                 "onMemoryButtonClick"       : self.memory_press,
@@ -76,6 +78,12 @@ class MainWindow:
         elif widget.get_label() == "gtk-paste":
             self.entry.set_text(clipboard.wait_for_text())
             self.refresh = False
+
+    def about(self, widget, data=None):
+        """
+        Show About Dialog
+        """
+        about_dialog = AboutDialog.AboutDialog()
 
     def cancel_press(self, widget, data=None):
         """
