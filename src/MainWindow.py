@@ -304,3 +304,9 @@ class MainWindow:
         else:
             return value
 
+    def run(self):
+        """
+        Run application
+        """
+        Gtk.main()
+
