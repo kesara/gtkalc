@@ -369,7 +369,7 @@
                 </child>
                 <child>
                   <object class="GtkButton" id="buttonFactorial">
-                    <property name="label" translatable="yes">!n</property>
+                    <property name="label" translatable="yes">n!</property>
                     <property name="visible">True</property>
                     <property name="can_focus">True</property>
                     <property name="receives_default">True</property>

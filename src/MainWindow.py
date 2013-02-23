@@ -195,7 +195,7 @@ class MainWindow:
         """
         if self.value:
             self.operation()
-        if widget.get_label() in ("!n", "√", "x²", "x³"):
+        if widget.get_label() in ("n!", "√", "x²", "x³"):
             self.operator = widget.get_label()
             self.single_value_operation()
         elif widget.get_label() != "=":
@@ -209,8 +209,8 @@ class MainWindow:
         """
         Perform operations where only one is involved.
         """
-        if self.operator == "!n":
-            self.history.insert_at_cursor("!{0} = ".format(
+        if self.operator == "n!":
+            self.history.insert_at_cursor("{0}! = ".format(
                 self.entry.get_text()))
             try:
                 self.entry.set_text(str(math.factorial(
